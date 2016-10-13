@@ -28,8 +28,13 @@ public class EmbedTomcat {
     private List<ListenerConfig> listenerList = new ArrayList<>();
     private List<ServletConfig> servletList = new ArrayList<>();
 
+    private Tomcat tomcat;
     private String displayName;
     private int port;
+
+    public Tomcat getTomcat() {
+        return tomcat;
+    }
 
     public void addContextParameter(InitParameter parameter) {
         parameterList.add(parameter);
@@ -52,6 +57,7 @@ public class EmbedTomcat {
     }
 
     public EmbedTomcat(String displayName, int port) {
+        this.tomcat = new Tomcat();
         this.displayName = displayName;
         this.port = port;
     }
@@ -102,7 +108,6 @@ public class EmbedTomcat {
     }
 
     public synchronized void startAwait() throws LifecycleException {
-        Tomcat tomcat = new Tomcat();
         tomcat.getHost().addChild(createContainer());
         tomcat.getService().addConnector(getConnector());
         tomcat.getHost().setAutoDeploy(false);
