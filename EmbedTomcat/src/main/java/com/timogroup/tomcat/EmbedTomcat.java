@@ -5,15 +5,15 @@ import com.timogroup.tomcat.config.ListenerConfig;
 import com.timogroup.tomcat.config.ServletConfig;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.*;
-import org.apache.catalina.mbeans.GlobalResourcesLifecycleListener;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.VersionLoggerListener;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -21,9 +21,14 @@ import java.util.*;
  */
 public class EmbedTomcat {
 
+    private static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11.Http11NioProtocol";
+    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
     private List<InitParameter> parameterList = new ArrayList<>();
     private List<ListenerConfig> listenerList = new ArrayList<>();
     private List<ServletConfig> servletList = new ArrayList<>();
+
+    private String displayName;
     private int port;
 
     public void addContextParameter(InitParameter parameter) {
@@ -38,15 +43,17 @@ public class EmbedTomcat {
         servletList.add(servletConfig);
     }
 
-    public int getPort() {
-        return port;
+    public void enableSpringMVC(String contextConfig, String servletConfig) {
+        ListenerConfig contextLoaderListener = DefaultFactory.getDefaultContextLoaderListener(contextConfig);
+        addListener(contextLoaderListener);
+        ServletConfig dispatcherServlet = DefaultFactory.getDefaultDispatcherServlet(servletConfig);
+        dispatcherServlet.setAsyncSupported(true);
+        addServlet(dispatcherServlet);
     }
 
-    public void setPort(int port) {
+    public EmbedTomcat(String displayName, int port) {
+        this.displayName = displayName;
         this.port = port;
-    }
-
-    public EmbedTomcat() {
     }
 
     public Container createContainer() {
@@ -83,11 +90,6 @@ public class EmbedTomcat {
         StandardContext context = new StandardContext();
         context.setPath("/");
         context.addServletContainerInitializer(initializer, Collections.emptySet());
-        context.addLifecycleListener(new VersionLoggerListener());
-        context.addLifecycleListener(new AprLifecycleListener());
-        context.addLifecycleListener(new JreMemoryLeakPreventionListener());
-        context.addLifecycleListener(new GlobalResourcesLifecycleListener());
-        context.addLifecycleListener(new ThreadLocalLeakPreventionListener());
         context.addLifecycleListener(new Tomcat.FixContextListener());
 
         Map<String, String> map = DefaultFactory.getDefaultMimeMapping();
@@ -101,9 +103,8 @@ public class EmbedTomcat {
 
     public synchronized void startAwait() throws LifecycleException {
         Tomcat tomcat = new Tomcat();
-        tomcat.setPort(port);
-        tomcat.getService().addExecutor(new StandardThreadExecutor());
         tomcat.getHost().addChild(createContainer());
+        tomcat.getService().addConnector(getConnector());
         tomcat.getHost().setAutoDeploy(false);
 
         tomcat.start();
@@ -111,13 +112,22 @@ public class EmbedTomcat {
         tomcat.getServer().await();
     }
 
+    private Connector getConnector() {
+        Connector connector = new Connector(DEFAULT_PROTOCOL);
+        connector.setURIEncoding(DEFAULT_CHARSET.name());
+        connector.setPort(port);
+        return connector;
+    }
+
     private void showLog() {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("**********************************\n");
-        buffer.append("*                                *\n");
-        buffer.append("*    EmbedTomcat Application     *\n");
-        buffer.append("*                                *\n");
-        buffer.append("**********************************\n");
+        buffer.append("**********************************" + System.lineSeparator());
+        buffer.append("*                                *" + System.lineSeparator());
+        buffer.append("*    EmbedTomcat Application     *" + System.lineSeparator());
+        buffer.append("*                                *" + System.lineSeparator());
+        buffer.append("**********************************" + System.lineSeparator());
+        buffer.append(String.format("DisplayName: %s", displayName) + System.lineSeparator());
+        buffer.append(String.format("Port: %d", port) + System.lineSeparator());
         System.out.println(buffer.toString());
     }
 }
