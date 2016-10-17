@@ -5,7 +5,6 @@ import com.timogroup.tomcat.config.ListenerConfig;
 import com.timogroup.tomcat.config.ServletConfig;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
@@ -13,16 +12,12 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
  * Created by TimoRD on 2016/7/6.
  */
 public class EmbedTomcat {
-
-    private static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11.Http11NioProtocol";
-    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     private List<InitParameter> parameterList = new ArrayList<>();
     private List<ListenerConfig> listenerList = new ArrayList<>();
@@ -109,19 +104,12 @@ public class EmbedTomcat {
 
     public synchronized void startAwait() throws LifecycleException {
         tomcat.getHost().addChild(createContainer());
-        tomcat.getService().addConnector(getConnector());
         tomcat.getHost().setAutoDeploy(false);
+        tomcat.setPort(port);
 
         tomcat.start();
         showLog();
         tomcat.getServer().await();
-    }
-
-    private Connector getConnector() {
-        Connector connector = new Connector(DEFAULT_PROTOCOL);
-        connector.setURIEncoding(DEFAULT_CHARSET.name());
-        connector.setPort(port);
-        return connector;
     }
 
     private void showLog() {
