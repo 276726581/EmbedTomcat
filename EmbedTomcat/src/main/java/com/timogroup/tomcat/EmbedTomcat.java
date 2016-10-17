@@ -1,5 +1,6 @@
 package com.timogroup.tomcat;
 
+import com.timogroup.tomcat.config.FilterConfig;
 import com.timogroup.tomcat.config.InitParameter;
 import com.timogroup.tomcat.config.ListenerConfig;
 import com.timogroup.tomcat.config.ServletConfig;
@@ -8,10 +9,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 import java.util.*;
 
 /**
@@ -21,6 +19,7 @@ public class EmbedTomcat {
 
     private List<InitParameter> parameterList = new ArrayList<>();
     private List<ListenerConfig> listenerList = new ArrayList<>();
+    private List<FilterConfig> filterList = new ArrayList<>();
     private List<ServletConfig> servletList = new ArrayList<>();
 
     private Tomcat tomcat;
@@ -39,13 +38,21 @@ public class EmbedTomcat {
         listenerList.add(listener);
     }
 
+    public void addFilter(FilterConfig filter) {
+        filterList.add(filter);
+    }
+
     public void addServlet(ServletConfig servletConfig) {
         servletList.add(servletConfig);
     }
 
-    public void enableSpringMVC(String contextConfig, String servletConfig) {
+    public void enableSpringMVC(String contextConfig, String servletConfig, String encoding) {
         ListenerConfig contextLoaderListener = DefaultFactory.getDefaultContextLoaderListener(contextConfig);
         addListener(contextLoaderListener);
+
+        FilterConfig filter = DefaultFactory.getDefaultCharacterEncodingFilter(encoding);
+        addFilter(filter);
+
         ServletConfig dispatcherServlet = DefaultFactory.getDefaultDispatcherServlet(servletConfig);
         dispatcherServlet.setAsyncSupported(true);
         addServlet(dispatcherServlet);
@@ -70,10 +77,16 @@ public class EmbedTomcat {
                     if (null != initParameter) {
                         ctx.setInitParameter(initParameter.getName(), initParameter.getValue());
                     }
+                    ctx.addListener(listenerConfig.getListenerClass());
                 }
 
-                for (ListenerConfig listenerConfig : listenerList) {
-                    ctx.addListener(listenerConfig.getListenerClass());
+                for (FilterConfig filterConfig : filterList) {
+                    FilterRegistration.Dynamic filter = ctx.addFilter(filterConfig.getFilterName(), filterConfig.getFilterClass());
+                    InitParameter initParameter = filterConfig.getInitParameter();
+                    if (null != initParameter) {
+                        filter.setInitParameter(initParameter.getName(), initParameter.getValue());
+                    }
+                    filter.setAsyncSupported(filterConfig.isAsyncSupported());
                 }
 
                 for (ServletConfig servletConfig : servletList) {

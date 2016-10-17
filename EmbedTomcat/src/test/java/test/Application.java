@@ -8,8 +8,8 @@ import com.timogroup.tomcat.EmbedTomcat;
 public class Application {
 
     public static void main(String[] args) throws Exception {
-        EmbedTomcat tomcat = new EmbedTomcat("tomcat", 8050);
-        tomcat.enableSpringMVC("classpath:app.xml", "classpath:mvc.xml");
+        EmbedTomcat tomcat = new EmbedTomcat("tomcat", 8020);
+        tomcat.enableSpringMVC("classpath:app.xml", "classpath:mvc.xml", "utf-8");
         tomcat.startAwait();
     }
 }

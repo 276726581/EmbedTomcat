@@ -1,9 +1,11 @@
 package com.timogroup.tomcat;
 
+import com.timogroup.tomcat.config.FilterConfig;
 import com.timogroup.tomcat.config.InitParameter;
 import com.timogroup.tomcat.config.ListenerConfig;
 import com.timogroup.tomcat.config.ServletConfig;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import java.util.HashMap;
@@ -22,6 +24,15 @@ public final class DefaultFactory {
         ListenerConfig config = new ListenerConfig();
         config.setListenerClass(ContextLoaderListener.class);
         InitParameter initParameter = new InitParameter("contextConfigLocation", xml);
+        config.setInitParameter(initParameter);
+        return config;
+    }
+
+    public static FilterConfig getDefaultCharacterEncodingFilter(String encoding) {
+        FilterConfig config = new FilterConfig();
+        config.setFilterName("encoding");
+        config.setFilterClass(CharacterEncodingFilter.class);
+        InitParameter initParameter = new InitParameter("encoding", encoding);
         config.setInitParameter(initParameter);
         return config;
     }
