@@ -4,10 +4,12 @@ import com.timogroup.tomcat.config.FilterConfig;
 import com.timogroup.tomcat.config.InitParameter;
 import com.timogroup.tomcat.config.ListenerConfig;
 import com.timogroup.tomcat.config.ServletConfig;
-import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.coyote.http11.Http11NioProtocol;
 
 import javax.servlet.*;
 import java.util.*;
@@ -17,17 +19,66 @@ import java.util.*;
  */
 public class EmbedTomcat {
 
+    private static final String DefaultServlet = "org.apache.catalina.servlets.DefaultServlet";
+    private static final String JspServlet = "org.apache.jasper.servlet.JspServlet";
+    private static final String Protocol = "org.apache.coyote.http11.Http11NioProtocol";
+
     private List<InitParameter> parameterList = new ArrayList<>();
     private List<ListenerConfig> listenerList = new ArrayList<>();
     private List<FilterConfig> filterList = new ArrayList<>();
     private List<ServletConfig> servletList = new ArrayList<>();
 
     private Tomcat tomcat;
-    private String displayName;
-    private int port;
+    private String displayName = "tomcat";
+    private int port = 8080;
+    private int maxThreads = 200;
+    private int maxConnections = 10000;
+    private int connectionTimeout = 60 * 1000;
+    private String encoding = "utf-8";
+    private Context defaultServlet;
 
     public Tomcat getTomcat() {
         return tomcat;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public int getMaxThreads() {
+        return maxThreads;
+    }
+
+    public void setMaxThreads(int maxThreads) {
+        this.maxThreads = maxThreads;
+    }
+
+    public int getMaxConnections() {
+        return maxConnections;
+    }
+
+    public void setMaxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     public void addContextParameter(InitParameter parameter) {
@@ -58,13 +109,33 @@ public class EmbedTomcat {
         addServlet(dispatcherServlet);
     }
 
-    public EmbedTomcat(String displayName, int port) {
+    public EmbedTomcat() {
         this.tomcat = new Tomcat();
-        this.displayName = displayName;
-        this.port = port;
     }
 
-    public Container createContainer() {
+    public synchronized void startAwait() throws LifecycleException {
+        tomcat.setPort(port);
+        tomcat.getHost().setAutoDeploy(false);
+
+        Connector connector = new Connector(Protocol);
+        Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
+        protocol.setMaxThreads(maxThreads);
+        protocol.setMaxConnections(maxConnections);
+        protocol.setConnectionTimeout(connectionTimeout);
+        connector.setPort(port);
+        connector.setURIEncoding(encoding);
+        tomcat.setConnector(connector);
+        tomcat.getService().addConnector(connector);
+
+        Context context = tomcat.addContext("/", null);
+        initTomcatContext(context);
+
+        tomcat.start();
+        showLog();
+        tomcat.getServer().await();
+    }
+
+    private void initTomcatContext(Context context) {
         ServletContainerInitializer initializer = new ServletContainerInitializer() {
             @Override
             public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
@@ -101,28 +172,39 @@ public class EmbedTomcat {
                 }
             }
         };
-        StandardContext context = new StandardContext();
-        context.setPath("/");
+
         context.addServletContainerInitializer(initializer, Collections.emptySet());
-        context.addLifecycleListener(new Tomcat.FixContextListener());
+        setDefaultServlet(context);
+        setJspServlet(context);
 
         Map<String, String> map = DefaultFactory.getDefaultMimeMapping();
         for (String key : map.keySet()) {
             String value = map.get(key);
             context.addMimeMapping(key, value);
         }
-
-        return context;
     }
 
-    public synchronized void startAwait() throws LifecycleException {
-        tomcat.getHost().addChild(createContainer());
-        tomcat.getHost().setAutoDeploy(false);
-        tomcat.setPort(port);
+    private void setDefaultServlet(Context context) {
+        Wrapper defaultServlet = context.createWrapper();
+        defaultServlet.setName("default");
+        defaultServlet.setServletClass(DefaultServlet);
+        defaultServlet.addInitParameter("debug", "0");
+        defaultServlet.addInitParameter("listings", "false");
+        defaultServlet.setLoadOnStartup(1);
+        defaultServlet.setOverridable(true);
+        context.addChild(defaultServlet);
+        context.addServletMapping("/", "default");
+    }
 
-        tomcat.start();
-        showLog();
-        tomcat.getServer().await();
+    private void setJspServlet(Context context) {
+        Wrapper jspServlet = context.createWrapper();
+        jspServlet.setName("jsp");
+        jspServlet.setServletClass(JspServlet);
+        jspServlet.addInitParameter("fork", "false");
+        jspServlet.setLoadOnStartup(3);
+        context.addChild(jspServlet);
+        context.addServletMapping("*.jsp", "jsp");
+        context.addServletMapping("*.jspx", "jsp");
     }
 
     private void showLog() {

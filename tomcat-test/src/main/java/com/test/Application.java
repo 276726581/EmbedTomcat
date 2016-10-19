@@ -1,4 +1,5 @@
-package test;
+package com.test;
+
 
 import com.timogroup.tomcat.EmbedTomcat;
 
@@ -8,8 +9,12 @@ import com.timogroup.tomcat.EmbedTomcat;
 public class Application {
 
     public static void main(String[] args) throws Exception {
-        EmbedTomcat tomcat = new EmbedTomcat("tomcat", 8020);
+        EmbedTomcat tomcat = new EmbedTomcat();
+        tomcat.setDisplayName("tomcat");
+        tomcat.setPort(8050);
+        tomcat.setMaxThreads(500);
         tomcat.enableSpringMVC("classpath:app.xml", "classpath:mvc.xml", "utf-8");
+
         tomcat.startAwait();
     }
 }

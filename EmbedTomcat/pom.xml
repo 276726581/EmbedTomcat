@@ -17,6 +17,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>8.0.36</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-logging-log4j</artifactId>
             <version>8.0.36</version>
         </dependency>
@@ -33,4 +38,5 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>
