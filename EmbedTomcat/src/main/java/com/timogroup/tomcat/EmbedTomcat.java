@@ -185,26 +185,29 @@ public class EmbedTomcat {
     }
 
     private void setDefaultServlet(Context context) {
+        String name = "default";
         Wrapper defaultServlet = context.createWrapper();
-        defaultServlet.setName("default");
+        defaultServlet.setName(name);
         defaultServlet.setServletClass(DefaultServlet);
         defaultServlet.addInitParameter("debug", "0");
         defaultServlet.addInitParameter("listings", "false");
         defaultServlet.setLoadOnStartup(1);
         defaultServlet.setOverridable(true);
         context.addChild(defaultServlet);
-        context.addServletMapping("/", "default");
+        context.addServletMapping("/", name);
     }
 
     private void setJspServlet(Context context) {
+        String name = "jsp";
         Wrapper jspServlet = context.createWrapper();
         jspServlet.setName("jsp");
         jspServlet.setServletClass(JspServlet);
         jspServlet.addInitParameter("fork", "false");
+        jspServlet.addInitParameter("xpoweredBy", "false");
         jspServlet.setLoadOnStartup(3);
         context.addChild(jspServlet);
-        context.addServletMapping("*.jsp", "jsp");
-        context.addServletMapping("*.jspx", "jsp");
+        context.addServletMapping("*.jsp", name);
+        context.addServletMapping("*.jspx", name);
     }
 
     private void showLog() {
