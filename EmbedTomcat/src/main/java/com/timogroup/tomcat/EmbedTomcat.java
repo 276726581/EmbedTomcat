@@ -28,6 +28,7 @@ public class EmbedTomcat {
 
     private Tomcat tomcat;
     private String displayName = "tomcat";
+    private String docBase;
     private int port = 8080;
     private int maxThreads = 200;
     private int maxConnections = 10000;
@@ -44,6 +45,14 @@ public class EmbedTomcat {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getDocBase() {
+        return docBase;
+    }
+
+    public void setDocBase(String docBase) {
+        this.docBase = docBase;
     }
 
     public int getPort() {
@@ -112,7 +121,7 @@ public class EmbedTomcat {
         tomcat.setConnector(connector);
         tomcat.getService().addConnector(connector);
 
-        Context context = tomcat.addContext("/", null);
+        Context context = tomcat.addContext("/", docBase);
         initTomcatContext(context);
 
         tomcat.start();

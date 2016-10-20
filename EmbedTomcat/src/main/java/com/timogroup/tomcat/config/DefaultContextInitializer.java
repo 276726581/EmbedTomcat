@@ -3,6 +3,8 @@ package com.timogroup.tomcat.config;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 
+import javax.servlet.ServletContainerInitializer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +15,13 @@ public class DefaultContextInitializer implements ContextInitializer {
 
     private static final String DefaultServlet = "org.apache.catalina.servlets.DefaultServlet";
     private static final String JspServlet = "org.apache.jasper.servlet.JspServlet";
+    private static final String JasperInitializer = "org.apache.jasper.servlet.JasperInitializer";
 
     @Override
     public void onStartup(Context context) {
         initDefaultServlet(context);
         initJspServlet(context);
+        initJasperInitializer(context);
         initMimeMapping(context);
     }
 
@@ -45,6 +49,20 @@ public class DefaultContextInitializer implements ContextInitializer {
         context.addChild(jspServlet);
         context.addServletMapping("*.jsp", name);
         context.addServletMapping("*.jspx", name);
+    }
+
+    private void initJasperInitializer(Context context) {
+        try {
+            ServletContainerInitializer initializer = (ServletContainerInitializer)
+                    Class.forName(JasperInitializer).newInstance();
+            context.addServletContainerInitializer(initializer, Collections.emptySet());
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initMimeMapping(Context context) {
