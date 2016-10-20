@@ -1,53 +1,61 @@
-package com.timogroup.tomcat;
+package com.timogroup.tomcat.config;
 
-import com.timogroup.tomcat.config.FilterConfig;
-import com.timogroup.tomcat.config.InitParameter;
-import com.timogroup.tomcat.config.ListenerConfig;
-import com.timogroup.tomcat.config.ServletConfig;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.DispatcherServlet;
+import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by TimoRD on 2016/7/8.
+ * Created by TimoRD on 2016/10/20.
  */
-public final class DefaultFactory {
+public class DefaultContextInitializer implements ContextInitializer {
 
-    private DefaultFactory() {
+    private static final String DefaultServlet = "org.apache.catalina.servlets.DefaultServlet";
+    private static final String JspServlet = "org.apache.jasper.servlet.JspServlet";
 
+    @Override
+    public void onStartup(Context context) {
+        initDefaultServlet(context);
+        initJspServlet(context);
+        initMimeMapping(context);
     }
 
-    public static ListenerConfig getDefaultContextLoaderListener(String xml) {
-        ListenerConfig config = new ListenerConfig();
-        config.setListenerClass(ContextLoaderListener.class);
-        InitParameter initParameter = new InitParameter("contextConfigLocation", xml);
-        config.setInitParameter(initParameter);
-        return config;
+    private void initDefaultServlet(Context context) {
+        String name = "default";
+        Wrapper defaultServlet = context.createWrapper();
+        defaultServlet.setName(name);
+        defaultServlet.setServletClass(DefaultServlet);
+        defaultServlet.addInitParameter("debug", "0");
+        defaultServlet.addInitParameter("listings", "false");
+        defaultServlet.setLoadOnStartup(1);
+        defaultServlet.setOverridable(true);
+        context.addChild(defaultServlet);
+        context.addServletMapping("/", name);
     }
 
-    public static FilterConfig getDefaultCharacterEncodingFilter(String encoding) {
-        FilterConfig config = new FilterConfig();
-        config.setFilterName("encoding");
-        config.setFilterClass(CharacterEncodingFilter.class);
-        InitParameter initParameter = new InitParameter("encoding", encoding);
-        config.setInitParameter(initParameter);
-        return config;
+    private void initJspServlet(Context context) {
+        String name = "jsp";
+        Wrapper jspServlet = context.createWrapper();
+        jspServlet.setName("jsp");
+        jspServlet.setServletClass(JspServlet);
+        jspServlet.addInitParameter("fork", "false");
+        jspServlet.addInitParameter("xpoweredBy", "false");
+        jspServlet.setLoadOnStartup(3);
+        context.addChild(jspServlet);
+        context.addServletMapping("*.jsp", name);
+        context.addServletMapping("*.jspx", name);
     }
 
-    public static ServletConfig getDefaultDispatcherServlet(String xml) {
-        ServletConfig config = new ServletConfig();
-        config.setServletName("dispatcherServlet");
-        config.setServletClass(DispatcherServlet.class);
-        InitParameter initParameter = new InitParameter("contextConfigLocation", xml);
-        config.setInitParameter(initParameter);
-        config.setUrlPatterns("/");
-        return config;
+    private void initMimeMapping(Context context) {
+        Map<String, String> map = getDefaultMimeMapping();
+        for (String key : map.keySet()) {
+            String value = map.get(key);
+            context.addMimeMapping(key, value);
+        }
     }
 
-    static Map<String, String> getDefaultMimeMapping() {
+    private Map<String, String> getDefaultMimeMapping() {
         Map<String, String> map = new HashMap<>();
         map.put("abs", "audio/x-mpeg");
         map.put("ai", "application/postscript");

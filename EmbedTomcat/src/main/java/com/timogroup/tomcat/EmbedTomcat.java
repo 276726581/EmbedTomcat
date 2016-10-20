@@ -1,41 +1,38 @@
 package com.timogroup.tomcat;
 
-import com.timogroup.tomcat.config.FilterConfig;
-import com.timogroup.tomcat.config.InitParameter;
-import com.timogroup.tomcat.config.ListenerConfig;
-import com.timogroup.tomcat.config.ServletConfig;
+import com.timogroup.tomcat.config.ContextInitializer;
+import com.timogroup.tomcat.config.ServletContextInitializer;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.Http11NioProtocol;
 
-import javax.servlet.*;
-import java.util.*;
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by TimoRD on 2016/7/6.
  */
 public class EmbedTomcat {
 
-    private static final String DefaultServlet = "org.apache.catalina.servlets.DefaultServlet";
-    private static final String JspServlet = "org.apache.jasper.servlet.JspServlet";
     private static final String Protocol = "org.apache.coyote.http11.Http11NioProtocol";
 
-    private List<InitParameter> parameterList = new ArrayList<>();
-    private List<ListenerConfig> listenerList = new ArrayList<>();
-    private List<FilterConfig> filterList = new ArrayList<>();
-    private List<ServletConfig> servletList = new ArrayList<>();
+    private List<ContextInitializer> contextInitializerList = new ArrayList<>();
+    private List<ServletContextInitializer> servletContextInitializerList = new ArrayList<>();
 
     private Tomcat tomcat;
     private String displayName = "tomcat";
     private int port = 8080;
     private int maxThreads = 200;
     private int maxConnections = 10000;
-    private int connectionTimeout = 60 * 1000;
+    private int connectionTimeout = 30 * 1000;
     private String encoding = "utf-8";
-    private Context defaultServlet;
 
     public Tomcat getTomcat() {
         return tomcat;
@@ -47,6 +44,14 @@ public class EmbedTomcat {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public int getMaxThreads() {
@@ -65,12 +70,12 @@ public class EmbedTomcat {
         this.maxConnections = maxConnections;
     }
 
-    public int getPort() {
-        return port;
+    public int getConnectionTimeout() {
+        return connectionTimeout;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setConnectionTimeout(int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
     }
 
     public String getEncoding() {
@@ -81,32 +86,12 @@ public class EmbedTomcat {
         this.encoding = encoding;
     }
 
-    public void addContextParameter(InitParameter parameter) {
-        parameterList.add(parameter);
+    public void addContextInitializer(ContextInitializer initializer) {
+        contextInitializerList.add(initializer);
     }
 
-    public void addListener(ListenerConfig listener) {
-        listenerList.add(listener);
-    }
-
-    public void addFilter(FilterConfig filter) {
-        filterList.add(filter);
-    }
-
-    public void addServlet(ServletConfig servletConfig) {
-        servletList.add(servletConfig);
-    }
-
-    public void enableSpringMVC(String contextConfig, String servletConfig, String encoding) {
-        ListenerConfig contextLoaderListener = DefaultFactory.getDefaultContextLoaderListener(contextConfig);
-        addListener(contextLoaderListener);
-
-        FilterConfig filter = DefaultFactory.getDefaultCharacterEncodingFilter(encoding);
-        addFilter(filter);
-
-        ServletConfig dispatcherServlet = DefaultFactory.getDefaultDispatcherServlet(servletConfig);
-        dispatcherServlet.setAsyncSupported(true);
-        addServlet(dispatcherServlet);
+    public void addServletContextInitializer(ServletContextInitializer initializer) {
+        servletContextInitializerList.add(initializer);
     }
 
     public EmbedTomcat() {
@@ -139,75 +124,16 @@ public class EmbedTomcat {
         ServletContainerInitializer initializer = new ServletContainerInitializer() {
             @Override
             public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
-                for (InitParameter initParameter : parameterList) {
-                    ctx.setInitParameter(initParameter.getName(), initParameter.getValue());
-                }
-
-                for (ListenerConfig listenerConfig : listenerList) {
-                    InitParameter initParameter = listenerConfig.getInitParameter();
-                    if (null != initParameter) {
-                        ctx.setInitParameter(initParameter.getName(), initParameter.getValue());
-                    }
-                    ctx.addListener(listenerConfig.getListenerClass());
-                }
-
-                for (FilterConfig filterConfig : filterList) {
-                    FilterRegistration.Dynamic filter = ctx.addFilter(filterConfig.getFilterName(), filterConfig.getFilterClass());
-                    InitParameter initParameter = filterConfig.getInitParameter();
-                    if (null != initParameter) {
-                        filter.setInitParameter(initParameter.getName(), initParameter.getValue());
-                    }
-                    filter.setAsyncSupported(filterConfig.isAsyncSupported());
-                }
-
-                for (ServletConfig servletConfig : servletList) {
-                    ServletRegistration.Dynamic servlet = ctx.addServlet(servletConfig.getServletName(), servletConfig.getServletClass());
-                    InitParameter initParameter = servletConfig.getInitParameter();
-                    if (null != initParameter) {
-                        servlet.setInitParameter(initParameter.getName(), initParameter.getValue());
-                    }
-                    servlet.addMapping(servletConfig.getUrlPatterns());
-                    servlet.setLoadOnStartup(servletConfig.getLoadOnStartup());
-                    servlet.setAsyncSupported(servletConfig.isAsyncSupported());
+                for (ServletContextInitializer servletContextInitializer : servletContextInitializerList) {
+                    servletContextInitializer.onStartup(ctx);
                 }
             }
         };
-
         context.addServletContainerInitializer(initializer, Collections.emptySet());
-        setDefaultServlet(context);
-        setJspServlet(context);
 
-        Map<String, String> map = DefaultFactory.getDefaultMimeMapping();
-        for (String key : map.keySet()) {
-            String value = map.get(key);
-            context.addMimeMapping(key, value);
+        for (ContextInitializer contextInitializer : contextInitializerList) {
+            contextInitializer.onStartup(context);
         }
-    }
-
-    private void setDefaultServlet(Context context) {
-        String name = "default";
-        Wrapper defaultServlet = context.createWrapper();
-        defaultServlet.setName(name);
-        defaultServlet.setServletClass(DefaultServlet);
-        defaultServlet.addInitParameter("debug", "0");
-        defaultServlet.addInitParameter("listings", "false");
-        defaultServlet.setLoadOnStartup(1);
-        defaultServlet.setOverridable(true);
-        context.addChild(defaultServlet);
-        context.addServletMapping("/", name);
-    }
-
-    private void setJspServlet(Context context) {
-        String name = "jsp";
-        Wrapper jspServlet = context.createWrapper();
-        jspServlet.setName("jsp");
-        jspServlet.setServletClass(JspServlet);
-        jspServlet.addInitParameter("fork", "false");
-        jspServlet.addInitParameter("xpoweredBy", "false");
-        jspServlet.setLoadOnStartup(3);
-        context.addChild(jspServlet);
-        context.addServletMapping("*.jsp", name);
-        context.addServletMapping("*.jspx", name);
     }
 
     private void showLog() {
