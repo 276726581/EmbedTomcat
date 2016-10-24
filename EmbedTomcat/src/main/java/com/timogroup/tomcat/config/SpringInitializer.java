@@ -1,8 +1,8 @@
 package com.timogroup.tomcat.config;
 
-import org.springframework.web.context.ContextLoaderListener;
+import com.timogroup.tomcat.context.RefreshContextLoaderListener;
+import com.timogroup.tomcat.context.RefreshDispatcherServlet;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
@@ -63,7 +63,7 @@ public class SpringInitializer implements ServletContextInitializer {
 
     private void initContextLoaderListener(ServletContext context) {
         context.setInitParameter("contextConfigLocation", contextConfig);
-        context.addListener(ContextLoaderListener.class);
+        context.addListener(RefreshContextLoaderListener.class);
     }
 
     private void initCharacterEncodingFilter(ServletContext context) {
@@ -73,7 +73,7 @@ public class SpringInitializer implements ServletContextInitializer {
     }
 
     private void initDispatcherServlet(ServletContext context) {
-        ServletRegistration.Dynamic servlet = context.addServlet("dispatcherServlet", DispatcherServlet.class);
+        ServletRegistration.Dynamic servlet = context.addServlet("dispatcherServlet", RefreshDispatcherServlet.class);
         servlet.setInitParameter("contextConfigLocation", dispatcherConfig);
         servlet.addMapping("/");
         servlet.setLoadOnStartup(1);

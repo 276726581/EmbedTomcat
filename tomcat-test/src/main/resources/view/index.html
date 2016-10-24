@@ -1,10 +1,436 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>Test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta user-agent="markable" content="local"/>
+    <title>应用魔盒-推荐-热门</title>
+    <style type="text/css">
+        body {
+            color: #787878;
+            background: #ffffff;
+        }
+
+        a {
+            color: #308CF2;
+        }
+
+        strong {
+            color: #ff6600;
+        }
+
+        .emph {
+            color: #ff6600;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .group {
+            padding: 0 9px;
+            margin: 4px 0 6px 0;
+        }
+
+        #navi {
+            padding: 8px 0 0 0;
+            border-bottom: solid 1px #2a6797;
+            text-align: center;
+            color: #ffffff;
+            background: #4D9BCF;
+        }
+
+        #navi a {
+            margin: 0 5px;
+            color: #ffffff;
+        }
+
+        #navi .wrap {
+            border-bottom: solid 2px #4A97CA;
+        }
+
+        #navi .bg1 {
+            border-top: solid 2px #4a97cb;
+            border-bottom: solid 2px #4794c7;
+        }
+
+        #navi .bg2 {
+            border-top: solid 2px #428ec0;
+        }
+
+        #menu {
+            padding: 8px 0 0 0;
+            border-top: solid 1px #f1f7fb;
+            border-bottom: solid 1px #e3e3e3;
+            margin: 0 0 1px 0;
+        }
+
+        #menu .wrap {
+            float: left;
+            padding: 0 0 0 2px;
+        }
+
+        #menu a {
+            color: #787878;
+            margin: 0 1px;
+        }
+
+        #menu .current {
+            color: #308CF2;
+        }
+
+        #menu .account-text {
+            float: right;
+            margin: 0 2px 0 0;
+        }
+
+        #menu .account-num {
+            float: right;
+        }
+
+        #menu .bg1 {
+            clear: both;
+            border-top: solid 1px #fefefe;
+            border-bottom: solid 1px #fcfcfc;
+        }
+
+        #menu .bg2 {
+            border-top: solid 2px #f8f8f8;
+            border-bottom: solid 2px #f3f3f3;
+        }
+
+        /*
+         * #plu_menu
+         */
+        #plu_menu {
+            padding: 8px 0 0 0;
+            border-top: solid 1px #f0f6fa;
+            border-bottom: solid 1px #ffffff;
+            margin: 0 0 1px 0;
+            text-align: center;
+        }
+
+        #plu_menu a {
+            color: #787878;
+            margin: 0 4px;
+        }
+
+        #plu_menu .current {
+            color: #308CF2;
+        }
+
+        #plu_menu .bg1 {
+            clear: both;
+            border-top: solid 2px #f8f8f8;
+            border-bottom: solid 2px #eeeeee;
+        }
+
+        #plu_menu .bg2 {
+            border-top: solid 2px #e5e5e5;
+            border-bottom: solid 2px #dddddd;
+        }
+
+        /*** paging ***/
+        .paging {
+            padding: 4px 0;
+            text-align: center;
+        }
+
+        .paging a {
+            color: #787878;
+            margin: 0 0 0 6px;
+        }
+
+        .paging .disabled {
+            margin: 0 0 0 6px;
+            color: #c6c6c6;
+        }
+
+        .paging .total {
+            margin: 0 0 0 6px;
+        }
+
+        /*** bottom_navi ***/
+        #bottom_navi {
+            padding: 4px 0 6px 0;
+            text-align: center;
+            color: #ffffff;
+            background: #4D9BCF;
+        }
+
+        #bottom_navi a {
+            margin: 0 2px;
+            color: #ffffff;
+        }
+
+        #ad {
+            text-align: center;
+        }
+
+        /*** title ***/
+        .title {
+            padding: 5px 9px;
+            margin: 0 0 3px 0;
+            color: #015597;
+            background: #dceef8;
+        }
+
+        .title .name {
+            float: left;
+        }
+
+        .title .outer-link {
+            float: right;
+        }
+
+        .first-title {
+            border-top: solid 1px #CFE0E9;
+        }
+
+        /*** app list ***/
+        .app {
+            /*padding: 5px 9px;*/
+            border-top: solid 1px #dfdfdf;
+        }
+
+        #first_app {
+            border-top: 0;
+        }
+
+        .app .down {
+            float: right;
+            color: #77B1D7;
+            background: #F4F4F4;
+        }
+
+        .app .img {
+            float: left;
+            /*margin: 0 5px 0 0;*/
+            color: #ffffff;
+            background: #ff6600;
+        }
+
+        .app .info {
+            /*padding: 0 30px 0 47px;*/
+        }
+
+        .app .name {
+            color: #2d2d2d;
+        }
+
+        .app .level {
+            margin: 0 0 0 4px;
+        }
+
+        .app .price {
+            margin: 0 0 0 4px;
+            color: #ff6600;
+        }
+
+        .go-top img {
+            float: right;
+            color: #083C68;
+            background: #E7E6E4;
+        }
+
+        /*** info list ***/
+        .info-list {
+            padding: 5px 9px;
+            border-top: solid 1px #dfdfdf;
+        }
+
+        #first_item {
+            border-top: 0;
+        }
+
+        .info-list .img {
+            float: left;
+            margin: 0 5px 0 0;
+            color: #ffffff;
+            background: #ff6600;
+        }
+
+        .info-list .info {
+            padding: 0 0 0 47px;
+        }
+
+        .info-list .name {
+            color: #2d2d2d;
+        }
+
+        /*
+         * end global
+         */
+        /*** app information ***/
+        #app_info {
+            padding: 6px 0;
+        }
+
+        #app_info .img {
+            float: left;
+            margin: 0 5px 0 9px;
+            color: #ffffff;
+            background: #ff6600;
+        }
+
+        #app_info .info {
+            padding: 0 0 0 74px;
+        }
+
+        #app_info a {
+            color: #2d2d2d;
+        }
+
+        #app_info .name {
+            margin: 0 2px 0 0;
+        }
+
+        #app_info .level {
+            margin: 0 0 0 2px;
+        }
+
+        #app_info .grade {
+            margin: 3px 0 0;
+        }
+
+        #app_info .price {
+            margin: 0 0 0 4px;
+            color: #ff6600;
+        }
+
+        #go_app {
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        #go_app img {
+            width: 222px;
+            height: 33px;
+            color: #ffffff;
+            background: #F89010;
+        }
+
+        #no_app {
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        #no_app img {
+            width: 222px;
+            height: 33px;
+            color: #ffffff;
+            background: #47A0DB;
+        }
+
+        #app_info .links {
+            padding: 0 0 0 9px;
+        }
+
+        #app_info .links a {
+            margin: 0 5px 0 0;
+            color: #308CF2;
+        }
+
+        /**/
+        #app_pic {
+            margin: 4px 0 6px 0;
+            text-align: center;
+        }
+
+        #app_pic img {
+            border: solid 1px #000001;
+            margin: 0 4px;
+        }
+
+        /*** comment ***/
+        .comm {
+            padding: 6px 9px;
+            border-top: solid 1px #D0DDE4;
+        }
+
+        #first_comm {
+            border-top: 0;
+        }
+
+        .comm .emph {
+            color: #4E9917;
+        }
+
+        #comm_links {
+            margin: 0 0 6px 0;
+            text-align: right;
+            color: #308CF2;
+        }
+
+        #comm_links a {
+            margin: 0 8px;
+            color: #308CF2;
+        }
+
+        /*** message ***/
+        .mes {
+            padding: 0 9px;
+            margin: 0 0 3px 0;
+        }
+
+        .mes .img {
+            float: left;
+            margin: 0 6px 0 0;
+        }
+
+        .mes div {
+            padding: 0 0 0 20px;
+        }
+
+        .error .img {
+            color: #ffffff;
+            background: #FF696B;
+        }
+
+        .tips .img {
+            color: #ffffff;
+            background: #FAA43D;
+        }
+
+        /*
+         * search
+         */
+        #search {
+            padding: 6px 9px;
+        }
+
+        #go_search {
+            width: 69px;
+            height: 29px;
+            margin: 0 0 0 80px;
+            color: #ffffff;
+            background: #70A000;
+        }
+    </style>
 </head>
 <body>
-Test HTML5
+<div class="app" href='http://appstore.51mrp.com/wap/detail/1571'>
+    <img src="http://p.mrpcdn.com/group7@M00/03/21/wKirPFJqPuEAAAAAAABCSC-xPnU974_42.PNG" alt="水浒传OL" width="42"
+         height="42" class="img"/>
+    <div class="info">水浒传水浒传水浒传传</div>
+    <div class="clear"/>
+</div>
+<div class="app" href='http://appstore.51mrp.com/wap/detail/1571'>
+    <img src="http://p.mrpcdn.com/group7@M00/03/21/wKirPFJqPuEAAAAAAABCSC-xPnU974_42.PNG" alt="水浒传OL" width="42"
+         height="42" class="img"/>
+    <div class="info">水浒传水浒传水浒传传</div>
+    <div class="clear"/>
+</div>
+<div class="app" href='http://appstore.51mrp.com/wap/detail/1571'>
+    <img src="http://p.mrpcdn.com/group7@M00/03/21/wKirPFJqPuEAAAAAAABCSC-xPnU974_42.PNG" alt="水浒传OL" width="42"
+         height="42" class="img"/>
+    <div class="info">水浒传水浒传水浒传传</div>
+    <div class="clear"/>
+</div>
+<div class="app" href='http://appstore.51mrp.com/wap/detail/1571'>
+    <img src="http://p.mrpcdn.com/group7@M00/03/21/wKirPFJqPuEAAAAAAABCSC-xPnU974_42.PNG" alt="水浒传OL" width="42"
+         height="42" class="img"/>
+    <div class="info">水浒传水浒传水浒传传</div>
+    <div class="clear"/>
+</div>
 </body>
 </html>

@@ -26,7 +26,7 @@ public class Application {
         EmbedTomcat tomcat = new EmbedTomcat();
         tomcat.setDocBase(root.getAbsolutePath());
         tomcat.setDisplayName("tomcat");
-        tomcat.setPort(8050);
+        tomcat.setPort(8000);
         tomcat.setMaxThreads(500);
         tomcat.addContextInitializer(new DefaultContextInitializer());
         SpringInitializer springInitializer = new SpringInitializer();
