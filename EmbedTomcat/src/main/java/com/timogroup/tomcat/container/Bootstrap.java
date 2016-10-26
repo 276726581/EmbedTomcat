@@ -60,13 +60,13 @@ public class Bootstrap {
     }
 
     private static void showHelp() {
-        System.out.println("-war: war path (default: app.war)");
-        System.out.println("-display: display name (default: tomcat)");
-        System.out.println("-port: port (default: 8080)");
-        System.out.println("-threads: number of threads (default: 200)");
-        System.out.println("-connections: number of connections (default: 10000)");
-        System.out.println("-encoding: encoding (default: utf-8)");
-        System.out.println("-timeout: timeout (default: 30000ms)");
+        System.out.println("--war: war path (default: app.war)");
+        System.out.println("--display: display name (default: tomcat)");
+        System.out.println("--port: port (default: 8080)");
+        System.out.println("--threads: number of threads (default: 200)");
+        System.out.println("--connections: number of connections (default: 10000)");
+        System.out.println("--encoding: encoding (default: utf-8)");
+        System.out.println("--timeout: timeout (default: 30000ms)");
     }
 
     private static boolean isWar(String war) {

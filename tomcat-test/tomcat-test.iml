@@ -10,7 +10,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="embed-tomcat" />
+    <orderEntry type="library" name="Maven: com.timogroup.tomcat:embed-tomcat:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-jasper:8.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jdt.core.compiler:ecj:4.5.1" level="project" />
