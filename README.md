@@ -1,7 +1,7 @@
 # EmbedTomcat
 嵌入式Tomcat
 
-# 使用方式1--运行war:
+### 使用方式1--运行war:
 java -jar embed-tomcat.jar --war app.war
 
 参数:
@@ -15,7 +15,7 @@ java -jar embed-tomcat.jar --war app.war
 -timeout: 超时 (默认: 30000ms)");
 ```
 
-# 使用方式2--嵌入Tomcat到程序中, 类似Spring boot(暂不支持jsp):
+### 使用方式2--嵌入Tomcat到程序中, 类似Spring boot(暂不支持jsp):
 
 例子:
 ``` java
