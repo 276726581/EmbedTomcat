@@ -6,13 +6,13 @@ java -jar embed-tomcat.jar --war app.war
 
 参数:
 ``` java
--war: war路径 (默认: app.war)");
--display: Tomcat名称 (默认: tomcat)");
--port: 端口号 (默认: 8080)");
--threads: 线程数 (默认: 200)");
--connections: 连接数 (默认: 10000)");
--encoding: 编码 (默认: utf-8)");
--timeout: 超时 (默认: 30000ms)");
+--war: war路径 (默认: app.war)");
+--display: Tomcat名称 (默认: tomcat)");
+--port: 端口号 (默认: 8080)");
+--threads: 线程数 (默认: 200)");
+--connections: 连接数 (默认: 10000)");
+--encoding: 编码 (默认: utf-8)");
+--timeout: 超时 (默认: 30000ms)");
 ```
 
 ### 使用方式2--嵌入Tomcat到程序中, 类似Spring boot(暂不支持jsp):
