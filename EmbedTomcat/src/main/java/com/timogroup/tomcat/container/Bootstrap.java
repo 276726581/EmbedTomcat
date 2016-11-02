@@ -22,9 +22,6 @@ public class Bootstrap {
             war = new File("app.war");
         } else {
             war = new File(programArgs.getArg("--war"));
-            if (!isWar(war.getAbsolutePath())) {
-                throw new RuntimeException("file not war");
-            }
         }
         if (!war.exists()) {
             throw new FileNotFoundException(war.getAbsolutePath());
@@ -67,18 +64,6 @@ public class Bootstrap {
         System.out.println("--connections: number of connections (default: 10000)");
         System.out.println("--encoding: encoding (default: utf-8)");
         System.out.println("--timeout: timeout (default: 30000ms)");
-    }
-
-    private static boolean isWar(String war) {
-        if (war == null || war.length() == 0) {
-            return false;
-        }
-        int index = war.lastIndexOf(".war");
-        if (-1 == index) {
-            return false;
-        }
-
-        return true;
     }
 
     private static String getString(String str, String defaultValue) {

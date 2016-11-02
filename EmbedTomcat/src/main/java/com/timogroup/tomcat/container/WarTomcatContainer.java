@@ -4,7 +4,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.Http11NioProtocol;
 
-import javax.servlet.ServletException;
 import java.io.File;
 
 /**
@@ -20,7 +19,11 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
 
     @Override
     protected Tomcat createTomcat() {
+        String dir = String.format("%s.%d", getDisplayName(), getPort());
+        File baseDir = new File(war.getParent(), dir);
+
         Tomcat tomcat = new Tomcat();
+        tomcat.setBaseDir(baseDir.getAbsolutePath());
         tomcat.setPort(getPort());
         Connector connector = new Connector(Http11NioProtocol);
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
@@ -37,10 +40,13 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
 
     @Override
     protected void onStart(Tomcat tomcat) {
+        if (!isWar(war.getAbsolutePath())) {
+            throw new RuntimeException("not found war");
+        }
+
         try {
-            tomcat.getHost().setAppBase(getParent(war.getAbsolutePath()));
             tomcat.addWebapp("/", war.getAbsolutePath());
-        } catch (ServletException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -53,6 +59,18 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
 
         String parent = file.substring(0, index);
         return parent;
+    }
+
+    private boolean isWar(String war) {
+        if (war == null || war.length() == 0) {
+            return false;
+        }
+        int index = war.lastIndexOf(".war");
+        if (-1 == index) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
