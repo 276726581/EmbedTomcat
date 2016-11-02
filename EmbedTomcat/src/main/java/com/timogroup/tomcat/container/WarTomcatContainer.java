@@ -1,6 +1,8 @@
 package com.timogroup.tomcat.container;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.Http11NioProtocol;
 
@@ -12,6 +14,7 @@ import java.io.File;
 public class WarTomcatContainer extends AbstractTomcatContainer {
 
     private File war;
+    private File baseDir;
 
     public WarTomcatContainer(File war) {
         this.war = war;
@@ -20,7 +23,7 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
     @Override
     protected Tomcat createTomcat() {
         String dir = String.format("%s.%d", getDisplayName(), getPort());
-        File baseDir = new File(war.getParent(), dir);
+        baseDir = new File(war.getParent(), dir);
 
         Tomcat tomcat = new Tomcat();
         tomcat.setBaseDir(baseDir.getAbsolutePath());
@@ -45,7 +48,14 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         }
 
         try {
-            tomcat.addWebapp("/", war.getAbsolutePath());
+            StandardHost host = (StandardHost) tomcat.getHost();
+            host.setAppBase(baseDir.getAbsolutePath());
+            host.setUnpackWARs(true);
+            host.setAutoDeploy(true);
+
+            StandardContext context = (StandardContext) tomcat.addWebapp("/", war.getAbsolutePath());
+            context.setUnpackWAR(true);
+            context.setReloadable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
