@@ -39,6 +39,14 @@ tomcat.startAwait();
         String result = username + " " + password;
         return result;
     }
+
+    private MockTomcat mockTomcat;
+
+    @Before
+    public void init() throws ServletException {
+        mockTomcat = new MockTomcat();
+        mockTomcat.init();
+    }
     
     @Test
     public void login() throws ServletException, IOException {
@@ -62,6 +70,14 @@ tomcat.startAwait();
         long size = file.getSize();
         String contentType = file.getContentType();
         byte[] bytes = file.getBytes();
+    }
+
+    private MockTomcat mockTomcat;
+
+    @Before
+    public void init() throws ServletException {
+        mockTomcat = new MockTomcat();
+        mockTomcat.init();
     }
     
     @Test
