@@ -28,3 +28,53 @@ springInitializer.setDispatcherConfig("classpath:mvc.xml");
 tomcat.addServletContextInitializer(springInitializer);
 tomcat.startAwait();
 ```
+
+### Mock
+例子:
+``` java
+    @RequestMapping("/login")
+    @ResponseBody
+    public String login(@RequestParam("username") String username,
+                        @RequestParam("password") String password) {
+        String result = username + " " + password;
+        return result;
+    }
+    
+    @Test
+    public void login() throws ServletException, IOException {
+        MockRequest request = mockTomcat.create();
+        MockResponse response = request.setMethod(RequestMethod.GET)
+                .setRequestURI("/login")
+                .addParameter("username", "admin")
+                .addParameter("password", "password")
+                .call();
+        int status = response.getStatus();
+        String body = response.getBodyAsString();
+        Assert.assertEquals(200, status);
+    }
+```
+上传文件:
+``` java
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public void upload(@RequestParam(value = "test") MultipartFile file) throws IOException {
+        String name = file.getName();
+        String originalFilename = file.getOriginalFilename();
+        long size = file.getSize();
+        String contentType = file.getContentType();
+        byte[] bytes = file.getBytes();
+    }
+    
+    @Test
+    public void upload() throws ServletException, IOException {
+        MockRequest request = mockTomcat.create();
+        MockMultipartRequest mockMultipartRequest = new MockMultipartRequest();
+        mockMultipartRequest.addFile(new MockMultipartFile("test", new byte[]{0xf, 0xf, 0xf}));
+        MockResponse response = request.setMethod(RequestMethod.GET)
+                .setRequestURI("/upload")
+                .setMultipartRequest(mockMultipartRequest)
+                .call();
+        int status = response.getStatus();
+        String body = response.getBodyAsString();
+        Assert.assertEquals(200, status);
+    }
+```
