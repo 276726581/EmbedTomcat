@@ -9,6 +9,7 @@ java -jar embed-tomcat.jar --war app.war
 --war: war路径 (默认: app.war)");
 --display: Tomcat名称 (默认: tomcat)");
 --port: 端口号 (默认: 8080)");
+--path: 根路径 (默认: /)");
 --threads: 线程数 (默认: 200)");
 --connections: 连接数 (默认: 10000)");
 --encoding: 编码 (默认: utf-8)");
