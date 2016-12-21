@@ -53,7 +53,7 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
             host.setUnpackWARs(true);
             host.setAutoDeploy(true);
 
-            StandardContext context = (StandardContext) tomcat.addWebapp("/", war.getAbsolutePath());
+            StandardContext context = (StandardContext) tomcat.addWebapp(getPath(), war.getAbsolutePath());
             context.setUnpackWAR(true);
             context.setReloadable(true);
         } catch (Exception e) {
@@ -94,6 +94,10 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         buffer.append(String.format("DisplayName: %s", getDisplayName()) + System.lineSeparator());
         buffer.append(String.format("Port: %d", getPort()) + System.lineSeparator());
         buffer.append(String.format("War: %s", war.getAbsolutePath()) + System.lineSeparator());
+        buffer.append(String.format("Path: %s", getPath()) + System.lineSeparator());
+        buffer.append(String.format("Threads: %d", getMaxThreads()) + System.lineSeparator());
+        buffer.append(String.format("MaxConnections: %d", getMaxConnections()) + System.lineSeparator());
+        buffer.append(String.format("Timeout: %s", getConnectionTimeout()) + System.lineSeparator());
         System.out.println(buffer.toString());
     }
 }

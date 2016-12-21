@@ -12,6 +12,7 @@ public abstract class AbstractTomcatContainer {
     private Tomcat tomcat;
     private String displayName = "tomcat";
     private int port = 8080;
+    private String path = "/";
     private int maxThreads = 200;
     private int maxConnections = 10000;
     private int connectionTimeout = 30 * 1000;
@@ -31,6 +32,14 @@ public abstract class AbstractTomcatContainer {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public int getMaxThreads() {

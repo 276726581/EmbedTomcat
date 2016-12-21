@@ -36,6 +36,10 @@ public class Bootstrap {
             int port = toInt(programArgs.getArg("--port"), tomcat.getPort());
             tomcat.setPort(port);
         }
+        if (programArgs.hasKey("--path")) {
+            String path = getString(programArgs.getArg("--path"), tomcat.getPath());
+            tomcat.setPath(path);
+        }
         if (programArgs.hasKey("--threads")) {
             int threads = toInt(programArgs.getArg("--threads"), tomcat.getMaxThreads());
             tomcat.setMaxThreads(threads);
@@ -60,6 +64,7 @@ public class Bootstrap {
         System.out.println("--war: war path (default: app.war)");
         System.out.println("--display: display name (default: tomcat)");
         System.out.println("--port: port (default: 8080)");
+        System.out.println("--path: path (default: /)");
         System.out.println("--threads: number of threads (default: 200)");
         System.out.println("--connections: number of connections (default: 10000)");
         System.out.println("--encoding: encoding (default: utf-8)");
