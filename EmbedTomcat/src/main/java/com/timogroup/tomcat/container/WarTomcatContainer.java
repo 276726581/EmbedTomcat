@@ -50,6 +50,7 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
         protocol.setTcpNoDelay(true);
 
+        protocol.setSelectorTimeout(1000);
         protocol.setConnectionTimeout(getConnectionTimeout());
         protocol.setKeepAliveTimeout(getConnectionTimeout());
         protocol.setConnectionUploadTimeout(2 * getConnectionTimeout());
@@ -60,6 +61,7 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         protocol.setMaxSavePostSize(10 * 1024);
 
         protocol.setBacklog(1024);
+        protocol.setMaxKeepAliveRequests(100);
         protocol.setPollerThreadCount(Runtime.getRuntime().availableProcessors());
         protocol.setAcceptorThreadCount(Runtime.getRuntime().availableProcessors());
         protocol.setMinSpareThreads(getMinThreads());
