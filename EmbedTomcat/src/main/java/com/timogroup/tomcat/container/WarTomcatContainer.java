@@ -60,8 +60,8 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         protocol.setMaxSavePostSize(10 * 1024);
 
         protocol.setBacklog(10240);
-        protocol.setPollerThreadCount(4);
-        protocol.setAcceptorThreadCount(4);
+        protocol.setPollerThreadCount(Runtime.getRuntime().availableProcessors());
+        protocol.setAcceptorThreadCount(Runtime.getRuntime().availableProcessors());
         protocol.setMinSpareThreads(getMinThreads());
         protocol.setMaxThreads(getMaxThreads());
         protocol.setProcessorCache(getMinThreads());
