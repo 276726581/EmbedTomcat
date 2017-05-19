@@ -51,15 +51,15 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         protocol.setTcpNoDelay(true);
 
         protocol.setConnectionTimeout(getConnectionTimeout());
-        protocol.setKeepAliveTimeout(30 * 1000);
-        protocol.setConnectionUploadTimeout(60 * 1000);
+        protocol.setKeepAliveTimeout(getConnectionTimeout());
+        protocol.setConnectionUploadTimeout(2 * getConnectionTimeout());
 
         protocol.setMaxHeaderCount(10 * 1024);
         protocol.setMaxHttpHeaderSize(10 * 1024);
         protocol.setMaxSwallowSize(5 * 1024 * 1024);
         protocol.setMaxSavePostSize(10 * 1024);
 
-        protocol.setBacklog(10240);
+        protocol.setBacklog(1024);
         protocol.setPollerThreadCount(Runtime.getRuntime().availableProcessors());
         protocol.setAcceptorThreadCount(Runtime.getRuntime().availableProcessors());
         protocol.setMinSpareThreads(getMinThreads());
