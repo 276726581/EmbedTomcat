@@ -89,6 +89,10 @@ public class EmbedTomcatContainer extends AbstractTomcatContainer {
         buffer.append("**********************************" + System.lineSeparator());
         buffer.append(String.format("DisplayName: %s", getDisplayName()) + System.lineSeparator());
         buffer.append(String.format("Port: %d", getPort()) + System.lineSeparator());
+        buffer.append(String.format("MixThreads: %d", getMinThreads()) + System.lineSeparator());
+        buffer.append(String.format("MaxThreads: %d", getMaxThreads()) + System.lineSeparator());
+        buffer.append(String.format("MaxConnections: %d", getMaxConnections()) + System.lineSeparator());
+        buffer.append(String.format("Timeout: %s", getConnectionTimeout()) + System.lineSeparator());
         System.out.println(buffer.toString());
     }
 }

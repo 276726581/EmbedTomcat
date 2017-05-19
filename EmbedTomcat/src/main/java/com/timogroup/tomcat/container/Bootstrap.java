@@ -40,8 +40,12 @@ public class Bootstrap {
             String path = getString(programArgs.getArg("--path"), tomcat.getPath());
             tomcat.setPath(path);
         }
-        if (programArgs.hasKey("--threads")) {
-            int threads = toInt(programArgs.getArg("--threads"), tomcat.getMaxThreads());
+        if (programArgs.hasKey("--minThreads")) {
+            int threads = toInt(programArgs.getArg("--minThreads"), tomcat.getMinThreads());
+            tomcat.setMinThreads(threads);
+        }
+        if (programArgs.hasKey("--maxThreads")) {
+            int threads = toInt(programArgs.getArg("--maxThreads"), tomcat.getMaxThreads());
             tomcat.setMaxThreads(threads);
         }
         if (programArgs.hasKey("--connections")) {
@@ -65,7 +69,8 @@ public class Bootstrap {
         System.out.println("--display: display name (default: tomcat)");
         System.out.println("--port: port (default: 8080)");
         System.out.println("--path: path (default: /)");
-        System.out.println("--threads: number of threads (default: 200)");
+        System.out.println("--minThreads: number of threads (default: 200)");
+        System.out.println("--maxThreads: number of threads (default: 300)");
         System.out.println("--connections: number of connections (default: 10000)");
         System.out.println("--encoding: encoding (default: utf-8)");
         System.out.println("--timeout: timeout (default: 30000ms)");

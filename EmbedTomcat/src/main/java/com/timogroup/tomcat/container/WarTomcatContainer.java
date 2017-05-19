@@ -1,5 +1,6 @@
 package com.timogroup.tomcat.container;
 
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -29,16 +30,42 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         tomcat.setBaseDir(baseDir.getAbsolutePath());
         tomcat.setPort(getPort());
         Connector connector = new Connector(Http11NioProtocol);
-        Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
-        protocol.setMaxThreads(getMaxThreads());
-        protocol.setMaxConnections(getMaxConnections());
-        protocol.setConnectionTimeout(getConnectionTimeout());
-        connector.setPort(getPort());
-        connector.setURIEncoding(getEncoding());
+        customizeConnector(connector);
         tomcat.setConnector(connector);
         tomcat.getService().addConnector(connector);
 
         return tomcat;
+    }
+
+    private void customizeConnector(Connector connector) {
+        connector.setPort(getPort());
+        connector.setURIEncoding(getEncoding());
+        connector.setEnableLookups(false);
+        connector.setAsyncTimeout(30 * 1000);
+        connector.setMaxHeaderCount(10 * 1024);
+        connector.setMaxParameterCount(10 * 1024);
+        connector.setMaxPostSize(10 * 1024 * 1024);
+        connector.setMaxSavePostSize(10 * 1024);
+
+        Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
+        protocol.setTcpNoDelay(true);
+
+        protocol.setConnectionTimeout(getConnectionTimeout());
+        protocol.setKeepAliveTimeout(30 * 1000);
+        protocol.setConnectionUploadTimeout(60 * 1000);
+
+        protocol.setMaxHeaderCount(10 * 1024);
+        protocol.setMaxHttpHeaderSize(10 * 1024);
+        protocol.setMaxSwallowSize(5 * 1024 * 1024);
+        protocol.setMaxSavePostSize(10 * 1024);
+
+        protocol.setBacklog(10240);
+        protocol.setPollerThreadCount(4);
+        protocol.setAcceptorThreadCount(4);
+        protocol.setMinSpareThreads(getMinThreads());
+        protocol.setMaxThreads(getMaxThreads());
+        protocol.setProcessorCache(getMinThreads());
+        protocol.setMaxConnections(getMaxConnections());
     }
 
     @Override
@@ -61,14 +88,12 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         }
     }
 
-    private String getParent(String file) {
-        int index = file.lastIndexOf(File.separator);
-        if (-1 == index) {
-            throw new RuntimeException("index: -1");
-        }
-
-        String parent = file.substring(0, index);
-        return parent;
+    @Override
+    protected void onStarted(Tomcat tomcat) {
+        StandardContext context = (StandardContext) tomcat.getHost().findChild("");
+        WebResourceRoot resources = context.getResources();
+        resources.setCachingAllowed(true);
+        resources.setCacheMaxSize(100 * 1024 * 1024);
     }
 
     private boolean isWar(String war) {
@@ -95,7 +120,8 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         buffer.append(String.format("Port: %d", getPort()) + System.lineSeparator());
         buffer.append(String.format("War: %s", war.getAbsolutePath()) + System.lineSeparator());
         buffer.append(String.format("Path: %s", getPath()) + System.lineSeparator());
-        buffer.append(String.format("Threads: %d", getMaxThreads()) + System.lineSeparator());
+        buffer.append(String.format("MixThreads: %d", getMinThreads()) + System.lineSeparator());
+        buffer.append(String.format("MaxThreads: %d", getMaxThreads()) + System.lineSeparator());
         buffer.append(String.format("MaxConnections: %d", getMaxConnections()) + System.lineSeparator());
         buffer.append(String.format("Timeout: %s", getConnectionTimeout()) + System.lineSeparator());
         System.out.println(buffer.toString());

@@ -13,7 +13,8 @@ public abstract class AbstractTomcatContainer {
     private String displayName = "tomcat";
     private int port = 8080;
     private String path = "/";
-    private int maxThreads = 200;
+    private int minThreads = 200;
+    private int maxThreads = 300;
     private int maxConnections = 10000;
     private int connectionTimeout = 30 * 1000;
     private String encoding = "utf-8";
@@ -40,6 +41,14 @@ public abstract class AbstractTomcatContainer {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public int getMinThreads() {
+        return minThreads;
+    }
+
+    public void setMinThreads(int minThreads) {
+        this.minThreads = minThreads;
     }
 
     public int getMaxThreads() {
@@ -91,11 +100,16 @@ public abstract class AbstractTomcatContainer {
         onStart(tomcat);
         tomcat.start();
         showBanner();
+        onStarted(tomcat);
         tomcat.getServer().await();
         onDestroy(tomcat);
     }
 
     protected void onStart(Tomcat tomcat) {
+
+    }
+
+    protected void onStarted(Tomcat tomcat) {
 
     }
 
