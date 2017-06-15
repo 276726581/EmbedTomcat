@@ -72,7 +72,7 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
 
     @Override
     protected void onStart(Tomcat tomcat) {
-        if (!isWar(war.getAbsolutePath())) {
+        if (!isWar(war.getAbsolutePath()) && !isWarPath(war.getAbsoluteFile())) {
             throw new RuntimeException("not found war");
         }
 
@@ -108,6 +108,15 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
         }
 
         return true;
+    }
+
+    private boolean isWarPath(File war) {
+        File webXml = new File(war, "/WEB-INF/web.xml");
+        if (webXml.exists()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
