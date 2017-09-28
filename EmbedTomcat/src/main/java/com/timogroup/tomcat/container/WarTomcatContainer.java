@@ -92,7 +92,7 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
 
     @Override
     protected void onStarted(Tomcat tomcat) {
-        StandardContext context = (StandardContext) tomcat.getHost().findChild("");
+        StandardContext context = (StandardContext) tomcat.getHost().findChild(getPath());
         WebResourceRoot resources = context.getResources();
         resources.setCachingAllowed(true);
         resources.setCacheMaxSize(100 * 1024 * 1024);
