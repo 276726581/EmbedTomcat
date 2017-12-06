@@ -1,5 +1,6 @@
 package com.timogroup.tomcat.container;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
@@ -92,10 +93,13 @@ public class WarTomcatContainer extends AbstractTomcatContainer {
 
     @Override
     protected void onStarted(Tomcat tomcat) {
-        StandardContext context = (StandardContext) tomcat.getHost().findChild(getPath());
-        WebResourceRoot resources = context.getResources();
-        resources.setCachingAllowed(true);
-        resources.setCacheMaxSize(100 * 1024 * 1024);
+        Container[] containers = tomcat.getHost().findChildren();
+        for (Container context : containers) {
+            StandardContext standardContext = (StandardContext) context;
+            WebResourceRoot resources = standardContext.getResources();
+            resources.setCachingAllowed(true);
+            resources.setCacheMaxSize(100 * 1024 * 1024);
+        }
     }
 
     private boolean isWar(String war) {
